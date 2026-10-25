@@ -1,0 +1,24 @@
+{# ==========================================================================
+   _auth_side.html
+   Kini ang sidebar sa login ug register pages (ang gradient nga bahin).
+   Ang underscore (_) sa sinugdanan kay nagpasabot nga "partial" ni siya,
+   dili standalone page - gi-include lang sa laing template.
+   ========================================================================== #}
+<aside class="auth-visual">
+  {# Ang "J" logo. Kung i-click, mobalik sa login page. #}
+  <a class="auth-brand" href="{{ url_for('login') }}" aria-label="Joseph.login with database">J</a>
+
+  {# Ang wordmark/branding. #}
+  <p class="auth-wordmark">Joseph.login <em>with database</em></p>
+
+  {# side_title ug side_text kay gipasa sa login.html/register.html. #}
+  <h2>{{ side_title }}</h2>
+  <p>{{ side_text }}</p>
+
+  {# Listahan sa mga feature/benefits. #}
+  <ul class="auth-points">
+    <li>Passwords hashed by Firebase</li>
+    <li>Profile saved in Firestore</li>
+    <li>Secure server session</li>
+  </ul>
+</aside>

@@ -1,0 +1,62 @@
+{# ==========================================================================
+   login.html
+   Kini ang login page. Nag-extend sa base.html ug nagpuno sa content block.
+   ========================================================================== #}
+{% extends "base.html" %}
+{# "extends" = mokuha sa layout sa base.html. #}
+
+{% block title %}Login{% endblock %}
+{# Ilisan ang title sa browser tab ngadto sa "Login". #}
+
+{% block bodyclass %}auth-page{% endblock %}
+{# "auth-page" class = special nga design para sa login/register pages. #}
+
+{% block content %}
+{# Kini nga duha ka variables kay ipadala sa _auth_side.html (sidebar). #}
+{% set side_title = "Welcome back." %}
+{% set side_text = "A secure login system powered by Firebase Authentication and Cloud Firestore. One account, one login." %}
+
+<main class="auth">
+  {# "include" = isulod dinhi ang tibuok _auth_side.html nga file. #}
+  {% include "_auth_side.html" %}
+
+  <section class="auth-form">
+    <h1>Log in</h1>
+    <p class="muted">Use the username or email and password for your account.</p>
+    {# class="muted" = mas light ang color sa text. #}
+
+    {# method="post" = ipadala ang datos sa server; action = asa nga route. #}
+    <form method="post" action="{{ url_for('login') }}" autocomplete="on">
+      <div class="field">
+        <label for="identifier">Username or email</label>
+        {# Ang id ug name pareho ("identifier") para mabasa sa request.form. #}
+        <input id="identifier" name="identifier" type="text" value="{{ identifier }}"
+               placeholder="e.g. juan_dc or juan@email.com" required autofocus>
+        {# required = dili pwede blangko; autofocus = cursor dinhi dayon. #}
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          {# type="password" = gitago ang gina-type (dots). #}
+          <input id="password" name="password" type="password"
+                 placeholder="••••••••" required>
+          {# type="button" = dili mo-submit sa form; data-target = asa nga input. #}
+          <button type="button" class="toggle" data-target="password"
+                  aria-label="Show password">Show</button>
+        </div>
+      </div>
+
+      {# class="block" = tibuok gilapdon ang button. #}
+      <button class="btn primary block" type="submit">Login</button>
+    </form>
+
+    <p class="switch">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{# I-load ang auth.js para mogana ang "Show/Hide password" button. #}
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
+{% endblock %}

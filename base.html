@@ -1,0 +1,101 @@
+{# ==========================================================================
+   base.html
+   Kini ang "skeleton" sa tanang page. Ang ubang templates kay mag-extend
+   niini, meaning mokuha sila sa layout ug ilisan lang ang block content.
+   ========================================================================== #}
+<!doctype html>
+{# "doctype" = nag-ingon sa browser nga HTML5 ang file. #}
+<html lang="en">
+{# lang="en" = English ang pinulongan sa page (para sa accessibility/SEO). #}
+<head>
+  <meta charset="utf-8">
+  {# charset="utf-8" = makabasa og tanang letra, apil na ang espesyal nga simbolo. #}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# viewport = para mohaom ang page sa cellphone ug computer screen. #}
+
+  {# block title = pwede ilisan sa child template (sama sa "Login"). #}
+  <title>{% block title %}Login System{% endblock %} · Joseph.login with database</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  {# Kini nga duha kay nagpa-bilis sa pag-load sa Google Fonts. #}
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  {# Nag-load sa "Inter" nga font nga gigamit sa tibuok design. #}
+
+  {# url_for('static', filename=...) = mokuha sa tamang URL sa file sa static/ folder. #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+{# Ang body class kay pwede ilisan sa child template, sama sa "auth-page". #}
+<body class="{% block bodyclass %}{% endblock %}">
+  <div class="page">
+
+    {# HEADER / TOP BAR #}
+    <header class="topbar">
+      {# Kung naka-login, dad-on sa dashboard; kung wala, sa login page. #}
+      <a class="brand" href="{{ url_for('dashboard') if session.get('session_cookie') else url_for('login') }}">
+        Joseph<span>.login</span><em class="brand-sub">with database</em>
+      </a>
+
+      {# Ipakita ang navigation kung naay session cookie (naka-login). #}
+      {% if session.get('session_cookie') %}
+      <nav class="topnav">
+        {# 'active' class = highlight ang kasamtangang page. #}
+        <a class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}" href="{{ url_for('dashboard') }}">Dashboard</a>
+
+        {# Admin link kay para sa admin lang. #}
+        {% if is_admin %}
+        <a class="nav-link {{ 'active' if request.endpoint == 'admin_users' }}" href="{{ url_for('admin_users') }}">Admin</a>
+        {% endif %}
+
+        <a class="nav-link {{ 'active' if request.endpoint == 'settings' }}" href="{{ url_for('settings') }}">Settings</a>
+
+        {# Ipakita ang full name; kung wala, ang username. #}
+        <span class="user-chip">{{ session.get('full_name') or session.get('username') }}</span>
+
+        {# Logout form: POST kay nag-usab og estado (mas safe kaysa GET). #}
+        <form method="post" action="{{ url_for('logout') }}">
+          <button type="submit" class="btn ghost">Logout</button>
+        </form>
+      </nav>
+      {% endif %}
+    </header>
+
+    {# WARNING kung wala pa naka-setup ang Firebase #}
+    {% if not firebase_ready %}
+      <div class="alert warning">
+        <strong>Firebase isn't set up yet.</strong>
+        Add <code>serviceAccountKey.json</code> and <code>FIREBASE_API_KEY</code> to <code>.env</code>.
+        See <code>README.md</code> for the step-by-step guide.
+        {# Kung naay error message, ipakita isip gamay nga text. #}
+        {% if firebase_error %}<br><small>{{ firebase_error }}</small>{% endif %}
+      </div>
+    {% endif %}
+
+    {# FLASH MESSAGES: temporary nga mensahe gikan sa flash() sa app.py #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alerts">
+          {# Ang category kay "success", "danger", o "warning" - gamit sa color. #}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {# DINHI IBUTANG sa child template ang iyang kaugalingong content. #}
+    {% block content %}{% endblock %}
+
+    <footer class="footer">Flask + Firebase (Auth + Firestore) · {{ current_year }}</footer>
+    {# current_year = gikan sa context processor sa app.py. #}
+  </div>
+
+  {# scripts block = para sa page-specific JS (sama sa auth.js). #}
+  {% block scripts %}{% endblock %}
+
+  {# ui.js = global nga JavaScript (confirm dialogs, copy buttons). #}
+  <script src="{{ url_for('static', filename='ui.js') }}"></script>
+</body>
+</html>
